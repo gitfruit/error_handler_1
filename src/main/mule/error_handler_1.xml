@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ef9a0664-211e-4ca9-8236-b9ddc41a24bc" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0e163818-e6b3-4de1-b43f-6ed0874bded1" >
+		<http:request-connection host="raml.org" />
+	</http:request-config>
+	<flow name="error_handler_1Flow" doc:id="d8dc200b-657e-4530-abf5-1361ab211130" >
+		<http:listener doc:name="Listener" doc:id="c69f3ae5-68c4-420d-84bb-2f2aba3ce523" config-ref="HTTP_Listener_config" path="/error"/>
+		<set-payload value="Actual payload" doc:name="Set Payload" doc:id="0bc9c677-8086-469f-b22d-d55e91e44104" />
+		<file:read doc:name="Read" doc:id="ec285d9e-8ef7-4a76-829e-8feb8d365089" path="C:\Users\hp\AnypointStudio\studio-workspace\error_handler_1\pom.xmldghf"/>
+		<http:request method="GET" doc:name="Request" doc:id="7a459173-9052-4fd2-aee1-8a14f64225d4" config-ref="HTTP_Request_configuration" path="/"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fc797804-8c3d-4ea4-823b-98e51767d421" type="FILE:ILLEGAL_PATH">
+				<logger level="INFO" doc:name="Logger" doc:id="2aca5bdc-24a3-417e-a57d-0d388375a565" message="file not found"/>
+				<set-payload doc:name="Set Payload" doc:id="4ff9aeef-928b-4301-9c07-814b12e7e005" value="#[payload]"/>
+			</on-error-continue>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="877c531e-38ed-42b3-bdb3-69cc78aa3b58" type="HTTP:CONNECTIVITY">
+				<logger level="INFO" doc:name="Logger" doc:id="68918d13-dd09-4946-83fc-e09ad3abf6d7" message="http not found  500 error"/>
+				<set-payload value="http not found  500 error" doc:name="Set Payload" doc:id="cb4c0d4b-3059-4730-b69f-1bb825d28815" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
